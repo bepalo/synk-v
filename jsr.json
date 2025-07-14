@@ -1,0 +1,9 @@
+{
+  "name": "@bepalo/synkv",
+  "description": "A modern synchronized key-value store library for javascript runtimes.",
+  "author": "Natnael Eshetu",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "exports": "./mod.ts"
+}
