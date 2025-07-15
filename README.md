@@ -1,6 +1,6 @@
-# Synkv
+# Cache
 
-A modern synchronized key-value store library for javascript runtimes.
+A fast and modern cache library for javascript runtimes.
 
 
 

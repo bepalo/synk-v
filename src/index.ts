@@ -1,8 +1,8 @@
 
 
-class Synkv {
+class Cache {
 }
 
-export { Synkv };
+export { Cache };
 
-export default Synkv;
+export default Cache;

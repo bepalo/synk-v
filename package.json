@@ -1,14 +1,14 @@
 {
-  "name": "@bepalo/synkv",
+  "name": "@bepalo/cache",
   "version": "0.1.0",
   "description": "A modern synchronized key-value store library for javascript runtimes.",
   "author": "Natnael Eshetu",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bepalo/synkv.git"
+    "url": "https://github.com/bepalo/cache.git"
   },
-  "homepage": "https://github.com/bepalo/synkv#readme",
+  "homepage": "https://github.com/bepalo/cache#readme",
   "exports": {
     "import": "./dist/index.js",
     "require": "./dist/cjs/index.js"

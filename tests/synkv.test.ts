@@ -1,8 +1,8 @@
 import { test, describe, expect, it } from "vitest";
-import Synkv from "../";
+import Cache from "../";
 
 
-test("Synkv tests", () => {
+test("Cache tests", () => {
   describe("sample test", () => {
     it("works", () => {
       expect(true).toBeTruthy();
