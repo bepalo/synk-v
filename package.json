@@ -1,6 +1,6 @@
 {
   "name": "@bepalo/cache",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A modern synchronized key-value store library for javascript runtimes.",
   "author": "Natnael Eshetu",
   "license": "MIT",
