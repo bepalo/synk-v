@@ -17,9 +17,13 @@
  * @exports CacheOnDeleteExpiredFn
  */
 
+import { List, ListNode } from "./list";
+export * from "./list";
+
 export type CacheEntry<Key = string, Value = unknown> = {
   value: Value,
   exp?: number|null,
+  lruNode?: ListNode<Key>;
 };
 
 export type GenericCacheKey = string | number | Symbol;
@@ -51,7 +55,8 @@ export type CacheConfig<Key = GenericCacheKey, Value = unknown> = {
 };
 
 export class Cache<Key=GenericCacheKey, Value=unknown> {
-  #store = new Map<Key, CacheEntry<Key, Value>>();
+  #store: Map<Key, CacheEntry<Key, Value>> = new Map();
+  #lruList: List<Key> = new List();
   #expBuckets = new Map<number, Set<Key>>();
   #intervalId?: ReturnType<typeof setTimeout> = undefined; 
   #now: CacheNowFn = () => Date.now();
@@ -223,6 +228,37 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
     return defaultExp;
   }
 
+  #updateLRU(key: Key, entry: CacheEntry<Key,Value>, evictLRU?: boolean) {
+    if(this.#lruMaxSize) {
+      if(entry.lruNode == null) {
+        entry.lruNode = this.#lruList.push(key);
+      } else if(entry.lruNode !== this.#lruList.last) {
+        const node = this.#lruList.remove(entry.lruNode);
+        this.#lruList.insertNodeAfter(node, this.#lruList.last!);
+      }
+      if(evictLRU && this.#store.size > this.#lruMaxSize) {
+        const lruKey = this.#lruList.popFirst();
+        if(lruKey != null) {
+          const exp = entry.exp;
+          if(exp) {
+            const bucketIndex = this.#bucketIndex(exp);
+            const bucket = this.#expBuckets.get(bucketIndex);
+            if(bucket) {
+              bucket.delete(lruKey);
+              if(bucket.size === 0) {
+                this.#expBuckets.delete(bucketIndex);
+              }
+            }
+          }
+          this.#store.delete(lruKey);
+          if(this.#onDelete) {
+            this.#onDelete(this, lruKey, entry, "LRU");
+          }
+        }
+      }
+    }
+  }
+
   has(key: Key, options?: {
     expired?: boolean
   }): boolean {
@@ -265,23 +301,15 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
         if(deleteExpired) {
           this.delete(key);
         } else if(expired) {
-          if(this.#lruMaxSize) {
-            // update LRU
-            this.#store.delete(key);
-            this.#store.set(key, entry);
-          }
+          this.#updateLRU(key, entry);
         } else if(this.#onGetMiss) {
-          // let refreshedEntry = undefined as CacheEntry<Key, unknown> | undefined;
           const result = this.#onGetMiss(this, key, "expired"); 
           if(result)
             return this.#store.get(key);
         }
         return expired ? entry : undefined;
-      } else if(this.#lruMaxSize){
-        // update LRU
-        this.#store.delete(key);
-        this.#store.set(key, entry);
-      }
+      } 
+      this.#updateLRU(key, entry);
     }
     return entry as CacheEntry<Key, Value>;
   }
@@ -325,8 +353,7 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
       }
       existingEntry.exp = exp;
       existingEntry.value = value;
-      this.#store.delete(key);
-      this.#store.set(key, existingEntry);
+      this.#updateLRU(key, existingEntry);
     } else {
       const entry = { value, exp } as CacheEntry<Key, Value>;
       if(exp) {
@@ -339,14 +366,7 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
         }
       }
       this.#store.set(key, entry);
-    }
-    // evict LRU item
-    {
-      const lruMaxSize = this.#lruMaxSize;
-      if(lruMaxSize && this.#store.size > lruMaxSize) {
-        const lruKey = this.#store.keys().next().value as Key;
-        this.delete(lruKey, "LRU");
-      }
+      this.#updateLRU(key, entry, true);
     }
   }
 
@@ -355,16 +375,13 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
     value?: Value
   }): boolean {
     const entry = this.#store.get(key);
-    if(entry) {
+    if(entry != null) {
       if(newEntry.hasOwnProperty("exp"))
         entry.exp = newEntry.exp;
       if(newEntry.value !== undefined)
         entry.value = newEntry.value;
       // update LRU
-      if(this.#lruMaxSize) {
-        this.#store.delete(key);
-        this.#store.set(key, entry);
-      }
+      this.#updateLRU(key, entry, true);
       return true;
     }
     return false;
@@ -383,6 +400,9 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
             this.#expBuckets.delete(bucketIndex);
           }
         }
+      }
+      if(entry.lruNode != null) {
+        this.#lruList.remove(entry.lruNode);
       }
       this.#store.delete(key);
       if(this.#onDelete) {
@@ -412,6 +432,9 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
     count = expired.length;
     for(const { key, bucket, entry } of expired) {
       bucket.delete(key);
+      if(entry.lruNode != null) {
+        this.#lruList.remove(entry.lruNode);
+      }
       this.#store.delete(key);
       if(this.#onDelete) {
         this.#onDelete(this, key, entry, "expired");
@@ -441,6 +464,7 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
       bucket.clear();
     }
     this.#expBuckets.clear();
+    this.#lruList.clear();
     this.#store.clear();
   }
 

@@ -16,9 +16,12 @@
  * @exports CacheOnDeleteFn
  * @exports CacheOnDeleteExpiredFn
  */
+import { ListNode } from "./list";
+export * from "./list";
 export type CacheEntry<Key = string, Value = unknown> = {
     value: Value;
     exp?: number | null;
+    lruNode?: ListNode<Key>;
 };
 export type GenericCacheKey = string | number | Symbol;
 export type CacheDeleteReason = "LRU" | "expired" | "deleted";
