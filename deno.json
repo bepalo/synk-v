@@ -1,6 +1,6 @@
 {
   "name": "@bepalo/cache",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "exports": {
     "./mod.ts": "./mod.ts"
   },
@@ -12,8 +12,7 @@
     "url": "https://github.com/bepalo/cache"
   },
   "compilerOptions": {
-    "strict": true,
-    "target": "ES2021"
+    "strict": true
   },
   "lint": {
     "include": ["./src/", "./bench/", "./tests/"],
@@ -36,5 +35,26 @@
   },
   "imports": {
     "@bepalo/cache": "./mod.ts"
-  }
+  },
+  "keywords": [
+    "cache",
+    "lru",
+    "ttl",
+    "memory cache",
+    "in-memory",
+    "fast cache",
+    "javascript cache",
+    "nodejs cache",
+    "deno cache",
+    "bun cache",
+    "local cache",
+    "data caching",
+    "expiry",
+    "eviction policy",
+    "cache performance",
+    "custom expiration",
+    "cache utility",
+    "cache store",
+    "lightweight cache"
+  ]
 }

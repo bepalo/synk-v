@@ -1,6 +1,6 @@
 {
   "name": "@bepalo/cache",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A fast and modern in-memory cache library with TTL and LRU for javascript runtimes.",
   "author": "Natnael Eshetu",
   "license": "MIT",
@@ -41,5 +41,26 @@
     "vitest": "^3.2.4",
     "vitest-markdown-reporter": "^0.1.2",
     "@types/bun": "latest"
-  }
+  },
+  "keywords": [
+    "cache",
+    "lru",
+    "ttl",
+    "memory cache",
+    "in-memory",
+    "fast cache",
+    "javascript cache",
+    "nodejs cache",
+    "deno cache",
+    "bun cache",
+    "local cache",
+    "data caching",
+    "expiry",
+    "eviction policy",
+    "cache performance",
+    "custom expiration",
+    "cache utility",
+    "cache store",
+    "lightweight cache"
+  ]
 }
