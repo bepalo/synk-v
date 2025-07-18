@@ -63,7 +63,7 @@ export declare class List<T> {
      */
     toString(): string;
     /** @returns {T[]} The list in array form */
-    [Symbol.toPrimitive](hint?: string): T[];
+    [Symbol.toPrimitive](_hint?: string): T[];
     /** @returns {number} Current size of the list */
     get size(): number;
     /** @returns {ListNode<T>|undefined} First node in the list */
@@ -140,15 +140,15 @@ export declare class List<T> {
      */
     rotate(amount: number): number;
     /**
-   * Removes `amount` nodes from the start of the list and returns the last node
-   * of the detached segment (i.e., the node that was at the boundary of the detachment).
-   *
-   * If `amount` is greater than or equal to the list size, the entire list is cleared,
-   * and the original first node is returned.
-   *
-   * @param {number} amount - Number of nodes to remove from the start.
-   * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
-   */
+     * Removes `amount` nodes from the start of the list and returns the last node
+     * of the detached segment (i.e., the node that was at the boundary of the detachment).
+     *
+     * If `amount` is greater than or equal to the list size, the entire list is cleared,
+     * and the original first node is returned.
+     *
+     * @param {number} amount - Number of nodes to remove from the start.
+     * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
+     */
     trimStart(amount: number): ListNode<T> | undefined;
     /**
      * Removes `amount` nodes from the end of the list and returns the first node

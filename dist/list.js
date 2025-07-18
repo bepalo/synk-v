@@ -119,7 +119,7 @@ class List {
         return this.toArray();
     }
     /** @returns {T[]} The list in array form */
-    [Symbol.toPrimitive](hint) {
+    [Symbol.toPrimitive](_hint) {
         return this.toArray();
     }
     /** @returns {number} Current size of the list */
@@ -341,11 +341,13 @@ class List {
         if (__classPrivateFieldGet(this, _List_first, "f") == null || __classPrivateFieldGet(this, _List_last, "f") == null || __classPrivateFieldGet(this, _List_size, "f") === 0) { // empty or invalid
             return 0;
         }
-        else if (__classPrivateFieldGet(this, _List_size, "f") === 1)
+        else if (__classPrivateFieldGet(this, _List_size, "f") === 1) {
             return 1;
+        }
         amount = amount % __classPrivateFieldGet(this, _List_size, "f");
-        if (amount === 0)
+        if (amount === 0) {
             return 0;
+        }
         // rotate via the shortest path
         const absAmount = Math.abs(amount);
         if (absAmount > __classPrivateFieldGet(this, _List_size, "f") / 2) {
@@ -373,15 +375,15 @@ class List {
         return absAmount;
     }
     /**
-   * Removes `amount` nodes from the start of the list and returns the last node
-   * of the detached segment (i.e., the node that was at the boundary of the detachment).
-   *
-   * If `amount` is greater than or equal to the list size, the entire list is cleared,
-   * and the original first node is returned.
-   *
-   * @param {number} amount - Number of nodes to remove from the start.
-   * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
-   */
+     * Removes `amount` nodes from the start of the list and returns the last node
+     * of the detached segment (i.e., the node that was at the boundary of the detachment).
+     *
+     * If `amount` is greater than or equal to the list size, the entire list is cleared,
+     * and the original first node is returned.
+     *
+     * @param {number} amount - Number of nodes to remove from the start.
+     * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
+     */
     trimStart(amount) {
         if (__classPrivateFieldGet(this, _List_first, "f") == null || __classPrivateFieldGet(this, _List_last, "f") == null || amount <= 0) { // empty
             return undefined;

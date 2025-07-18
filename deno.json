@@ -1,0 +1,40 @@
+{
+  "name": "@bepalo/cache",
+  "version": "1.0.0",
+  "exports": {
+    "./mod.ts": "./mod.ts"
+  },
+  "description": "A fast and modern in-memory cache library with TTL and LRU for JavaScript runtimes.",
+  "license": "MIT",
+  "homepage": "https://github.com/bepalo/cache",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bepalo/cache"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2021"
+  },
+  "lint": {
+    "include": ["./src/", "./bench/", "./tests/"],
+    "rules": {
+      "tags": ["recommended"],
+      "exclude": ["no-sloppy-imports"]
+    }
+  },
+  "fmt": {
+    "include": ["./src/", "./bench/", "./tests/"],
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": false,
+    "proseWrap": "preserve"
+  },
+  "test": {
+    "files": {
+      "exclude": ["tests/**", "**/*.vitest.ts"]
+    }
+  },
+  "imports": {
+    "@bepalo/cache": "./mod.ts"
+  }
+}

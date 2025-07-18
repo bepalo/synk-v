@@ -10,7 +10,6 @@
  * @template T
  */
 export class ListNode<T> {
-
   /**
    * Creates a new ListNode.
    * @param {T} value - Value held by this node.
@@ -47,7 +46,7 @@ export class List<T> {
    * @returns {IterableIterator<T>}
    */
   *[Symbol.iterator](): IterableIterator<T> {
-    for(let it = this.#first; it != null; it = it.next) {
+    for (let it = this.#first; it != null; it = it.next) {
       yield it.value;
     }
   }
@@ -57,7 +56,7 @@ export class List<T> {
    * @returns {IterableIterator<T>}
    */
   *entries(): IterableIterator<T> {
-    for(let it = this.#first; it != null; it = it.next) {
+    for (let it = this.#first; it != null; it = it.next) {
       yield it.value;
     }
   }
@@ -67,7 +66,7 @@ export class List<T> {
    * @returns {IterableIterator<ListNode<T>>}
    */
   *iterator(): IterableIterator<ListNode<T>> {
-    for(let it = this.#first; it != null; it = it.next) {
+    for (let it = this.#first; it != null; it = it.next) {
       yield it;
     }
   }
@@ -77,7 +76,7 @@ export class List<T> {
    * @returns {IterableIterator<ListNode<T>>}
    */
   *reverseIterator(): IterableIterator<ListNode<T>> {
-    for(let it = this.#last; it != null; it = it.prev) {
+    for (let it = this.#last; it != null; it = it.prev) {
       yield it;
     }
   }
@@ -87,8 +86,8 @@ export class List<T> {
    * @returns {T[]}
    */
   toArray(): T[] {
-    const values:T[] = new Array(this.#size);
-    for(let it = this.#first, i = 0; it != null; it = it.next, i++) {
+    const values: T[] = new Array(this.#size);
+    for (let it = this.#first, i = 0; it != null; it = it.next, i++) {
       values[i] = it.value;
     }
     return values;
@@ -116,7 +115,7 @@ export class List<T> {
   }
 
   /** @returns {T[]} The list in array form */
-  [Symbol.toPrimitive](hint?: string): T[] {
+  [Symbol.toPrimitive](_hint?: string): T[] {
     return this.toArray();
   }
 
@@ -141,15 +140,15 @@ export class List<T> {
    */
   popFirst(): T | undefined {
     const value = this.#first?.value;
-    if(this.#first == null || this.#last == null) { // empty
+    if (this.#first == null || this.#last == null) { // empty
       return undefined;
-    } else if(this.#first == this.#last) { // one element
+    } else if (this.#first == this.#last) { // one element
       this.#first = undefined;
       this.#last = undefined;
       this.#size--;
     } else { // many elements
       this.#first = this.#first.next;
-      if(this.#first != null) {
+      if (this.#first != null) {
         this.#first.prev = undefined;
       }
       this.#size--;
@@ -163,15 +162,15 @@ export class List<T> {
    */
   pop(): T | undefined {
     const value = this.#last?.value;
-    if(this.#first == null || this.#last == null) { // empty
+    if (this.#first == null || this.#last == null) { // empty
       return undefined;
-    } else if(this.#first == this.#last) { // one element
+    } else if (this.#first == this.#last) { // one element
       this.#first = undefined;
       this.#last = undefined;
       this.#size--;
     } else { // many elements
       this.#last = this.#last.prev;
-      if(this.#last != null) {
+      if (this.#last != null) {
         this.#last.next = undefined;
       }
       this.#size--;
@@ -186,7 +185,7 @@ export class List<T> {
    */
   push(value: T): ListNode<T> {
     const node = new ListNode<T>(value);
-    if(this.#first == null || this.#last == null) { // empty
+    if (this.#first == null || this.#last == null) { // empty
       this.#first = this.#last = node;
     } else { // many elements
       node.prev = this.#last;
@@ -204,7 +203,7 @@ export class List<T> {
    */
   pushStart(value: T): ListNode<T> {
     const node = new ListNode<T>(value);
-    if(this.#first == null || this.#last == null) { // empty
+    if (this.#first == null || this.#last == null) { // empty
       this.#first = this.#last = node;
     } else { // many elements
       node.next = this.#first;
@@ -224,11 +223,11 @@ export class List<T> {
   insertNodeAfter(node: ListNode<T>, targetNode: ListNode<T>): ListNode<T> {
     node.prev = targetNode;
     node.next = targetNode.next;
-    if(targetNode.next != null) {
+    if (targetNode.next != null) {
       targetNode.next.prev = node;
     }
     targetNode.next = node;
-    if(targetNode === this.#last) {
+    if (targetNode === this.#last) {
       this.#last = node;
     }
     this.#size++;
@@ -243,11 +242,11 @@ export class List<T> {
    */
   insertAfter(value: T, targetNode: ListNode<T>): ListNode<T> {
     const node = new ListNode<T>(value, targetNode, targetNode.next);
-    if(targetNode.next != null) {
+    if (targetNode.next != null) {
       targetNode.next.prev = node;
     }
     targetNode.next = node;
-    if(targetNode === this.#last) {
+    if (targetNode === this.#last) {
       this.#last = node;
     }
     this.#size++;
@@ -263,11 +262,11 @@ export class List<T> {
   insertNodeBefore(node: ListNode<T>, targetNode: ListNode<T>): ListNode<T> {
     node.prev = targetNode.prev;
     node.next = targetNode;
-    if(targetNode.prev != null) {
+    if (targetNode.prev != null) {
       targetNode.prev.next = node;
     }
     targetNode.prev = node;
-    if(targetNode === this.#first) {
+    if (targetNode === this.#first) {
       this.#first = node;
     }
     this.#size++;
@@ -282,11 +281,11 @@ export class List<T> {
    */
   insertBefore(value: T, targetNode: ListNode<T>): ListNode<T> {
     const node = new ListNode<T>(value, targetNode.prev, targetNode);
-    if(targetNode.prev != null) {
+    if (targetNode.prev != null) {
       targetNode.prev.next = node;
     }
     targetNode.prev = node;
-    if(targetNode === this.#first) {
+    if (targetNode === this.#first) {
       this.#first = node;
     }
     this.#size++;
@@ -299,16 +298,16 @@ export class List<T> {
    * @returns {ListNode<T>} The removed node.
    */
   remove(node: ListNode<T>): ListNode<T> {
-    if(node.next != null) {
+    if (node.next != null) {
       node.next.prev = node.prev;
     }
-    if(node.prev != null) {
+    if (node.prev != null) {
       node.prev.next = node.next;
     }
-    if(this.#first === node) {
+    if (this.#first === node) {
       this.#first = node.next;
     }
-    if(this.#last === node) {
+    if (this.#last === node) {
       this.#last = node.prev;
     }
     this.#size--;
@@ -332,16 +331,18 @@ export class List<T> {
    * @returns {number} The absolute number of rotations performed.
    */
   rotate(amount: number): number {
-    if(this.#first == null || this.#last == null || this.#size === 0) { // empty or invalid
+    if (this.#first == null || this.#last == null || this.#size === 0) { // empty or invalid
       return 0;
-    } else if(this.#size === 1)
+    } else if (this.#size === 1) {
       return 1;
+    }
     amount = amount % this.#size;
-    if( amount === 0)
+    if (amount === 0) {
       return 0;
+    }
     // rotate via the shortest path
     const absAmount = Math.abs(amount);
-    if(absAmount > this.#size / 2) {
+    if (absAmount > this.#size / 2) {
       amount = amount > 0 ? amount - this.#size : this.#size + amount;
     }
     // make circular
@@ -349,10 +350,10 @@ export class List<T> {
     this.#last.next = this.#first;
     // find the new start node
     let it: ListNode<T> = this.#first;
-    if(amount > 0) {
-      while(amount-- > 0) it = it.next!;
+    if (amount > 0) {
+      while (amount-- > 0) it = it.next!;
     } else {
-      while(amount++ < 0) it = it.prev!;
+      while (amount++ < 0) it = it.prev!;
     }
     // reset the first and last nodes
     this.#first = it;
@@ -364,46 +365,46 @@ export class List<T> {
   }
 
   /**
- * Removes `amount` nodes from the start of the list and returns the last node
- * of the detached segment (i.e., the node that was at the boundary of the detachment).
- * 
- * If `amount` is greater than or equal to the list size, the entire list is cleared,
- * and the original first node is returned.
- * 
- * @param {number} amount - Number of nodes to remove from the start.
- * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
- */
+   * Removes `amount` nodes from the start of the list and returns the last node
+   * of the detached segment (i.e., the node that was at the boundary of the detachment).
+   *
+   * If `amount` is greater than or equal to the list size, the entire list is cleared,
+   * and the original first node is returned.
+   *
+   * @param {number} amount - Number of nodes to remove from the start.
+   * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
+   */
   trimStart(amount: number): ListNode<T> | undefined {
-    if(this.#first == null || this.#last == null || amount <= 0) { // empty
+    if (this.#first == null || this.#last == null || amount <= 0) { // empty
       return undefined;
-    } 
+    }
     let node = this.#first;
-    if(this.#first == this.#last) { // one element
+    if (this.#first == this.#last) { // one element
       this.#first = undefined;
       this.#last = undefined;
       this.#size = 0;
-    } else if(amount >= this.#size) { // trimming all elements
+    } else if (amount >= this.#size) { // trimming all elements
       // clear
       this.#first = this.#last = undefined;
       this.#size = 0;
     } else { // many elements
       // iterate via the shortest path
       const absAmount = Math.abs(amount);
-      if(absAmount > this.#size / 2) {
+      if (absAmount > this.#size / 2) {
         amount = amount > 0 ? amount - this.#size : this.#size + amount;
       }
       let it: ListNode<T>;
-      if(amount > 0) {
+      if (amount > 0) {
         it = this.#first;
-        while(amount-- > 0) it = it.next!;
+        while (amount-- > 0) it = it.next!;
       } else {
         it = this.#last;
-        while(++amount < 0) it = it.prev!;
+        while (++amount < 0) it = it.prev!;
       }
       // detach end
       node = it.prev!;
       it.prev!.next = undefined;
-      it.prev = undefined; 
+      it.prev = undefined;
       this.#first = it;
       this.#size -= absAmount;
     }
@@ -413,50 +414,49 @@ export class List<T> {
   /**
    * Removes `amount` nodes from the end of the list and returns the first node
    * of the detached segment (i.e., the node that was at the boundary of the detachment).
-   * 
+   *
    * If `amount` is greater than or equal to the list size, the entire list is cleared,
    * and the original last node is returned.
-   * 
+   *
    * @param {number} amount - Number of nodes to remove from the end.
    * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
    */
   trimEnd(amount: number): ListNode<T> | undefined {
-    if(this.#first == null || this.#last == null || amount <= 0) { // empty
+    if (this.#first == null || this.#last == null || amount <= 0) { // empty
       return undefined;
     }
     let node = this.#last;
-    if(this.#first == this.#last) { // one element
+    if (this.#first == this.#last) { // one element
       this.#first = undefined;
       this.#last = undefined;
       this.#size--;
-    } else if(amount >= this.#size) { // trimming all elements
+    } else if (amount >= this.#size) { // trimming all elements
       // clear
       this.#first = this.#last = undefined;
       this.#size = 0;
     } else { // many elements
       // iterate via the shortest path
       const absAmount = Math.abs(amount);
-      if(absAmount > this.#size / 2) {
+      if (absAmount > this.#size / 2) {
         amount = amount > 0 ? amount - this.#size : this.#size + amount;
       }
       let it: ListNode<T>;
-      if(amount > 0) {
+      if (amount > 0) {
         it = this.#last;
-        while(amount-- > 0) it = it.prev!;
+        while (amount-- > 0) it = it.prev!;
       } else {
         it = this.#first;
-        while(++amount < 0) it = it.next!;
+        while (++amount < 0) it = it.next!;
       }
       // detach end
       node = it.next!;
       it.next!.prev = undefined;
-      it.next = undefined; 
+      it.next = undefined;
       this.#last = it;
       this.#size -= absAmount;
     }
     return node;
   }
-
 }
 
 export default List;

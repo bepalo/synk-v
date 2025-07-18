@@ -1,5 +1,5 @@
 // benchmark.js
-import * as Cache from "npm:@bepalo/cache"; // for deno
+import { Cache } from "@bepalo/cache";
 import { randomUUID } from "node:crypto";
 // import os from "node:os";
 
@@ -33,9 +33,11 @@ function benchmark(label, fn, iterations, warmup, warmupIterations, cleanup) {
   const totalTime = end - start;
   const opsPerSec = Math.floor((count / totalTime) * 1000);
   console.log(
-    `| ${label.padEnd(28)} | ${(1e9 / ((1000 * count) / totalTime))
-      .toLocaleString(undefined, { minimumFractionDigits: 3 })
-      .padStart(12)} | ${opsPerSec.toLocaleString().padStart(12)} |`
+    `| ${label.padEnd(28)} | ${
+      (1e9 / ((1000 * count) / totalTime))
+        .toLocaleString(undefined, { minimumFractionDigits: 3 })
+        .padStart(12)
+    } | ${opsPerSec.toLocaleString().padStart(12)} |`,
   );
   return opsPerSec;
 }
@@ -71,7 +73,7 @@ async function run() {
   }
 
   console.log(
-    `\n**Benchmarking @bepalo/cache (N=\`${iterations.toLocaleString()}\` LRU-Limit=\`${lruMaxSize.toLocaleString()}\` K=\`${keyType}\`)**\n`
+    `\n**Benchmarking @bepalo/cache (N=\`${iterations.toLocaleString()}\` LRU-Limit=\`${lruMaxSize.toLocaleString()}\` K=\`${keyType}\`)**\n`,
   );
 
   console.log("| Operation                    | ns/operation | operations/s |");
@@ -87,7 +89,7 @@ async function run() {
     (i) => {
       cache.get(keys[i]);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   await sleep(restMillis);
@@ -101,7 +103,7 @@ async function run() {
     (i) => {
       cache.get(keys1[i]);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   cache.clear();
@@ -117,7 +119,7 @@ async function run() {
     (i) => {
       cache.get(keys1[i]);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   await sleep(restMillis);
@@ -131,7 +133,7 @@ async function run() {
     (i) => {
       cache.set(keys1[i], i + 20);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   await sleep(restMillis);
@@ -145,7 +147,7 @@ async function run() {
     (i) => {
       cache.set(keys1[i], i + 20);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   await sleep(restMillis);
@@ -166,7 +168,7 @@ async function run() {
         exp,
       });
     },
-    warmupIterations
+    warmupIterations,
   );
 
   await sleep(450);
@@ -178,7 +180,7 @@ async function run() {
     () => {
       return cache.deleteExpired();
     },
-    1
+    1,
   );
 
   console.assert(0 === cache.size);
@@ -189,7 +191,7 @@ async function run() {
     () => {
       cache.deleteExpired();
     },
-    iterations
+    iterations,
   );
 
   console.log(`\n**Comparing with native Map**\n`);
@@ -208,7 +210,7 @@ async function run() {
     (i) => {
       nativeMap.get(keys[i]);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   await sleep(restMillis);
@@ -222,7 +224,7 @@ async function run() {
     (i) => {
       nativeMap.get(keys1[i]);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   nativeMap.clear();
@@ -238,7 +240,7 @@ async function run() {
     (i) => {
       nativeMap.get(keys1[i]);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   nativeMap.clear();
@@ -254,7 +256,7 @@ async function run() {
     (i) => {
       nativeMap.set(keys1[i], i + 20);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   await sleep(restMillis);
@@ -268,7 +270,7 @@ async function run() {
     (i) => {
       nativeMap.set(keys1[i], i + 30);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   console.assert(iterations + warmupIterations === nativeMap.size);
@@ -284,7 +286,7 @@ async function run() {
     (i) => {
       nativeMap.delete(keys1[i]);
     },
-    warmupIterations
+    warmupIterations,
   );
 
   console.assert(0 === nativeMap.size);
@@ -300,7 +302,7 @@ async function run() {
     (i) => {
       nativeMap.delete(keys1[i]);
     },
-    warmupIterations
+    warmupIterations,
   );
 }
 
