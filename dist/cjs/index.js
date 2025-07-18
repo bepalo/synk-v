@@ -1,7 +1,6 @@
 "use strict";
 /**
- *  A fast and modern cache library for javascript runtimes.
- *
+ * @file A fast and modern cache library for javascript runtimes.
  * @module @bepalo/cache
  * @author Natnael Eshetu
  * @exports Cache
@@ -47,9 +46,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Cache = void 0;
 const list_1 = require("./list");
 __exportStar(require("./list"), exports);
+/**
+ * A fast and modern in-memory cache with optional expiration and LRU eviction.
+ *
+ * @template Key - Cache key type (defaults to string | number | symbol).
+ * @template Value - Cache value type.
+ */
 class Cache {
+    /**
+     * Creates a new Cache instance with optional configuration.
+     *
+     * The cache supports LRU eviction, time-based expiration (TTL), and customizable hooks
+     * for get, miss, delete, and periodic cleanup behavior.
+     *
+     * @param {CacheConfig<Key, Value>} [config] - Configuration object.
+     * @param {CacheNowFn} [config.now] - A function returning the current time (e.g., Date.now()). Used for custom clocks or testing.
+     * @param {CacheDefaultExpFn} [config.defaultExp] - Function to compute default expiration timestamps (overridden by `exp` or `maxAge`).
+     * @param {number|null} [config.defaultMaxAge] - TTL (in milliseconds by default) to apply if no explicit expiration is given.
+     * @param {number|null} [config.lruMaxSize] - Maximum number of entries. When exceeded, least-recently-used items are evicted.
+     * @param {number} [config.cleanupInterval] - Interval in ms for automatic deletion of expired entries. Set to 0 to disable.
+     * @param {number} [config.expiryBucketSize=300000] - Granularity of expiration bucketing (in milliseconds by default). Smaller = more precise, but slower.
+     * @param {boolean} [config.getExpired=false] - Whether to return expired entries from `.get()` (useful for diagnostics or soft TTL).
+     * @param {boolean} [config.deleteExpiredOnGet=false] - If true, expired items are immediately removed when accessed.
+     * @param {CacheOnGetHitFn<Key, Value>} [config.onGetHit] - Hook called when a `get()` returns a valid (non-expired) value.
+     * @param {CacheOnGetMissFn<Key, Value>} [config.onGetMiss] - Hook called when a key is not found or is expired (returns reason).
+     * @param {CacheOnDeleteFn<Key, Value>} [config.onDelete] - Hook called whenever an entry is removed, with reason (e.g., LRU or expired).
+     * @param {CacheOnDeleteExpiredFn} [config.onDeleteExpired] - Hook called when `deleteExpired()` runs, with count of removed entries.
+     */
     constructor(config) {
         _Cache_instances.add(this);
+        // Private fields
         _Cache_store.set(this, new Map());
         _Cache_lruList.set(this, new list_1.List());
         _Cache_expBuckets.set(this, new Map());
@@ -105,56 +131,137 @@ class Cache {
         }
         this.startCleanupInterval();
     }
+    get lruList() {
+        return __classPrivateFieldGet(this, _Cache_lruList, "f");
+    }
+    get expBuckets() {
+        return __classPrivateFieldGet(this, _Cache_expBuckets, "f");
+    }
+    /**
+     * Enables `for...of` iteration over the cache.
+     *
+     * @returns {IterableIterator<[Key, CacheEntry]>}
+     */
     [(_Cache_store = new WeakMap(), _Cache_lruList = new WeakMap(), _Cache_expBuckets = new WeakMap(), _Cache_intervalId = new WeakMap(), _Cache_now = new WeakMap(), _Cache_timeScale = new WeakMap(), _Cache_defaultExp = new WeakMap(), _Cache_defaultMaxAge = new WeakMap(), _Cache_lruMaxSize = new WeakMap(), _Cache_cleanupInterval = new WeakMap(), _Cache_expiryBucketSize = new WeakMap(), _Cache_getExpired = new WeakMap(), _Cache_deleteExpiredOnGet = new WeakMap(), _Cache_onGetHit = new WeakMap(), _Cache_onGetMiss = new WeakMap(), _Cache_onDelete = new WeakMap(), _Cache_onDeleteExpired = new WeakMap(), _Cache_instances = new WeakSet(), _Cache_bucketIndex = function _Cache_bucketIndex(time) {
         return Math.floor(time / __classPrivateFieldGet(this, _Cache_expiryBucketSize, "f"));
+    }, _Cache_updateLRU = function _Cache_updateLRU(key, entry, evictLRU) {
+        if (__classPrivateFieldGet(this, _Cache_lruMaxSize, "f")) {
+            if (entry.lruNode == null) {
+                entry.lruNode = __classPrivateFieldGet(this, _Cache_lruList, "f").push(entry);
+            }
+            else if (entry.lruNode !== __classPrivateFieldGet(this, _Cache_lruList, "f").last) {
+                const node = __classPrivateFieldGet(this, _Cache_lruList, "f").remove(entry.lruNode);
+                __classPrivateFieldGet(this, _Cache_lruList, "f").insertNodeAfter(node, __classPrivateFieldGet(this, _Cache_lruList, "f").last);
+            }
+            if (evictLRU && __classPrivateFieldGet(this, _Cache_store, "f").size > __classPrivateFieldGet(this, _Cache_lruMaxSize, "f")) {
+                const lruEntry = __classPrivateFieldGet(this, _Cache_lruList, "f").popFirst();
+                if (lruEntry != null) {
+                    const lruKey = lruEntry.key;
+                    const exp = entry.exp;
+                    if (exp) {
+                        const bucketIndex = __classPrivateFieldGet(this, _Cache_instances, "m", _Cache_bucketIndex).call(this, exp);
+                        const bucket = __classPrivateFieldGet(this, _Cache_expBuckets, "f").get(bucketIndex);
+                        if (bucket) {
+                            bucket.delete(lruKey);
+                            if (bucket.size === 0) {
+                                __classPrivateFieldGet(this, _Cache_expBuckets, "f").delete(bucketIndex);
+                            }
+                        }
+                    }
+                    __classPrivateFieldGet(this, _Cache_store, "f").delete(lruKey);
+                    if (__classPrivateFieldGet(this, _Cache_onDelete, "f")) {
+                        __classPrivateFieldGet(this, _Cache_onDelete, "f").call(this, this, lruKey, lruEntry, "LRU");
+                    }
+                }
+            }
+        }
     }, Symbol.iterator)]() {
         return __classPrivateFieldGet(this, _Cache_store, "f")[Symbol.iterator]();
     }
+    /** @returns {CacheNowFn} The set `now` function. */
     get now() {
         return __classPrivateFieldGet(this, _Cache_now, "f");
     }
+    /** @returns {number} The time scale to get milliseconds calculated using Date.now(). */
     get timeScale() {
         return __classPrivateFieldGet(this, _Cache_timeScale, "f");
     }
+    /** @returns {CacheDefaultExpFn} The set default expiry function. */
     get defaultExp() {
         return __classPrivateFieldGet(this, _Cache_defaultExp, "f");
     }
+    /** @returns {number|undefined|null} The set default max-age value. */
     get defaultMaxAge() {
         return __classPrivateFieldGet(this, _Cache_defaultMaxAge, "f");
     }
+    /** @returns {number|undefined|null} The set max LRU size. */
     get lruMaxSize() {
         return __classPrivateFieldGet(this, _Cache_lruMaxSize, "f");
     }
+    /** @returns {number|undefined|null} The set cleanup interval. */
     get cleanupInterval() {
         return __classPrivateFieldGet(this, _Cache_cleanupInterval, "f");
     }
+    /** @returns {number} The set expiry bucket size. */
     get expiryBucketSize() {
         return __classPrivateFieldGet(this, _Cache_expiryBucketSize, "f");
     }
+    /** @returns {CacheOnDeleteExpiredFn|null|undefined} The set on-delete-expired event function. */
     get onDeleteExpired() {
         return __classPrivateFieldGet(this, _Cache_onDeleteExpired, "f");
     }
+    /** @returns {CacheOnDeleteFn<Key,Value>|null|undefined} The set on-delete event function. */
     get onDelete() {
         return __classPrivateFieldGet(this, _Cache_onDelete, "f");
     }
+    /** @returns {CacheOnGetHitFn<Key,Value>|null|undefined} The set on-get-cache-hit event function. */
     get onGetHit() {
         return __classPrivateFieldGet(this, _Cache_onGetHit, "f");
     }
+    /** @returns {CacheOnGetMissFn<Key,Value>|null|undefined} The set on-get-cache-miss event function. */
     get onGetMiss() {
         return __classPrivateFieldGet(this, _Cache_onGetMiss, "f");
     }
+    /**
+     * Gets the number of entries in the cache (including expired ones).
+     *
+     * @returns {number} The number of stored entries.
+     */
     get size() {
         return __classPrivateFieldGet(this, _Cache_store, "f").size;
     }
+    /**
+     * Iterates over the cache keys.
+     *
+     * @returns {IterableIterator<Key>} Iterator over keys.
+     */
     keys() {
         return __classPrivateFieldGet(this, _Cache_store, "f").keys();
     }
+    /**
+     * Iterates over cache values (entries).
+     *
+     * @returns {IterableIterator<CacheEntry>} Iterator over entries.
+     */
     values() {
         return __classPrivateFieldGet(this, _Cache_store, "f").values();
     }
+    /**
+     * Iterates over cache entries as [key, entry] tuples.
+     *
+     * @returns {IterableIterator<[Key, CacheEntry]>} Iterator over key-value pairs.
+     */
     entries() {
         return __classPrivateFieldGet(this, _Cache_store, "f").entries();
     }
+    /**
+     * Starts the automatic cleanup interval to remove expired entries.
+     *
+     * @param {Object} [options]
+     * @param {number} [options.interval] - Interval (in milliseconds by default).
+     * @param {boolean} [options.restart=false] - Whether to force restart an existing interval.
+     * @returns {boolean} True if interval was started, false if skipped.
+     */
     startCleanupInterval(options) {
         var _a;
         if (__classPrivateFieldGet(this, _Cache_intervalId, "f")) {
@@ -175,9 +282,21 @@ class Cache {
         }
         return false;
     }
+    /**
+     * Restarts the cleanup interval with a new or existing interval duration.
+     *
+     * @param {Object} [options]
+     * @param {number} [options.interval] - Optional new interval.
+     * @returns {boolean} True if interval was restarted.
+     */
     restartCleanupInterval(options) {
         return this.startCleanupInterval(Object.assign(Object.assign({}, options), { restart: true }));
     }
+    /**
+     * Stops the automatic cleanup interval.
+     *
+     * @returns {boolean} True if the interval was running and was stopped.
+     */
     stopCleanupInterval() {
         if (__classPrivateFieldGet(this, _Cache_intervalId, "f")) {
             clearInterval(__classPrivateFieldGet(this, _Cache_intervalId, "f"));
@@ -186,6 +305,13 @@ class Cache {
         }
         return false;
     }
+    /**
+     * Computes the default expiration timestamp.
+     *
+     * @param {number|null} [exp] - Custom expiration timestamp.
+     * @param {number|null} [maxAge] - Milliseconds from now to expire.
+     * @returns {number|null|undefined} Final expiration timestamp or null/undefined.
+     */
     getDefaultExp(exp, maxAge) {
         var _a;
         maxAge = maxAge !== null && maxAge !== void 0 ? maxAge : __classPrivateFieldGet(this, _Cache_defaultMaxAge, "f");
@@ -194,6 +320,14 @@ class Cache {
             : null)) !== null && _a !== void 0 ? _a : __classPrivateFieldGet(this, _Cache_defaultExp, "f").call(this);
         return defaultExp;
     }
+    /**
+     * Checks if a key exists in the cache.
+     *
+     * @param {Key} key - Cache key.
+     * @param {Object} [options]
+     * @param {boolean} [options.expired=false] - Whether to include expired entries.
+     * @returns {boolean} True if the key exists and (by default) is not expired.
+     */
     has(key, options) {
         const entry = __classPrivateFieldGet(this, _Cache_store, "f").get(key);
         if (entry) {
@@ -207,6 +341,15 @@ class Cache {
         }
         return false;
     }
+    /**
+     * Retrieves an entry from the cache.
+     *
+     * @param {Key} key - Cache key.
+     * @param {Object} [options]
+     * @param {boolean} [options.expired=false] - Whether to return expired entries.
+     * @param {boolean} [options.deleteExpired=false] - Whether to delete expired entries on access.
+     * @returns {CacheEntry|undefined} The entry or undefined if missing or expired.
+     */
     get(key, options) {
         let entry = __classPrivateFieldGet(this, _Cache_store, "f").get(key);
         if (!entry && __classPrivateFieldGet(this, _Cache_onGetMiss, "f")) {
@@ -245,6 +388,14 @@ class Cache {
         }
         return entry;
     }
+    /**
+     * Retrieves a cache entry without affecting LRU order or triggering events.
+     *
+     * @param {Key} key - Cache key.
+     * @param {Object} [options]
+     * @param {boolean} [options.expired=false] - Whether to include expired entries.
+     * @returns {CacheEntry|undefined} The entry or undefined.
+     */
     peek(key, options) {
         const entry = __classPrivateFieldGet(this, _Cache_store, "f").get(key);
         if (entry && entry.exp && entry.exp <= this.now() && !(options === null || options === void 0 ? void 0 : options.expired)) {
@@ -252,6 +403,15 @@ class Cache {
         }
         return entry;
     }
+    /**
+     * Sets a value in the cache.
+     *
+     * @param {Key} key - Cache key.
+     * @param {Value} value - Value to store.
+     * @param {Object} [options]
+     * @param {number} [options.exp] - Exact expiration timestamp.
+     * @param {number} [options.maxAge] - TTL (in milliseconds by default) from now.
+     */
     set(key, value, options) {
         const exp = this.getDefaultExp(options === null || options === void 0 ? void 0 : options.exp, options === null || options === void 0 ? void 0 : options.maxAge);
         const existingEntry = __classPrivateFieldGet(this, _Cache_store, "f").get(key);
@@ -281,7 +441,7 @@ class Cache {
             __classPrivateFieldGet(this, _Cache_instances, "m", _Cache_updateLRU).call(this, key, existingEntry);
         }
         else {
-            const entry = { value, exp };
+            const entry = { key, value, exp };
             if (exp) {
                 const bucketIndex = __classPrivateFieldGet(this, _Cache_instances, "m", _Cache_bucketIndex).call(this, exp);
                 const existingBucketMap = __classPrivateFieldGet(this, _Cache_expBuckets, "f").get(bucketIndex);
@@ -295,19 +455,60 @@ class Cache {
             __classPrivateFieldGet(this, _Cache_instances, "m", _Cache_updateLRU).call(this, key, entry, true);
         }
     }
-    update(key, newEntry) {
+    /**
+     * Updates an existing cache entry’s expiration or value.
+     *
+     * @param {Key} key - Cache key.
+     * @param {Object} changes
+     * @param {number} [changes.exp] - New expiration timestamp.
+     * @param {Value} [changes.value] - New value.
+     * @returns {boolean} True if the entry exists and was updated.
+     */
+    update(key, changes) {
+        var _a;
         const entry = __classPrivateFieldGet(this, _Cache_store, "f").get(key);
         if (entry != null) {
-            if (newEntry.hasOwnProperty("exp"))
-                entry.exp = newEntry.exp;
-            if (newEntry.value !== undefined)
-                entry.value = newEntry.value;
+            if (changes.hasOwnProperty("exp") || changes.hasOwnProperty("maxAge")) {
+                const exp = (_a = changes.exp) !== null && _a !== void 0 ? _a : (changes.maxAge ? this.now() + changes.maxAge : null);
+                // remove from old expiry bucket
+                if (entry.exp && entry.exp !== exp) {
+                    const bucketIndex = __classPrivateFieldGet(this, _Cache_instances, "m", _Cache_bucketIndex).call(this, entry.exp);
+                    const bucket = __classPrivateFieldGet(this, _Cache_expBuckets, "f").get(bucketIndex);
+                    if (bucket) {
+                        bucket.delete(key);
+                        if (bucket.size === 0) {
+                            __classPrivateFieldGet(this, _Cache_expBuckets, "f").delete(bucketIndex);
+                        }
+                    }
+                }
+                // add to new expiry bucket
+                if (exp) {
+                    const bucketIndex = __classPrivateFieldGet(this, _Cache_instances, "m", _Cache_bucketIndex).call(this, exp);
+                    const existingBucketMap = __classPrivateFieldGet(this, _Cache_expBuckets, "f").get(bucketIndex);
+                    const bucket = existingBucketMap !== null && existingBucketMap !== void 0 ? existingBucketMap : new Set();
+                    bucket.add(key);
+                    if (!existingBucketMap) {
+                        __classPrivateFieldGet(this, _Cache_expBuckets, "f").set(bucketIndex, bucket);
+                    }
+                }
+                entry.exp = exp;
+            }
+            if (changes.hasOwnProperty("value")) {
+                entry.value = changes.value;
+            }
             // update LRU
             __classPrivateFieldGet(this, _Cache_instances, "m", _Cache_updateLRU).call(this, key, entry, true);
             return true;
         }
         return false;
     }
+    /**
+     * Deletes a key from the cache.
+     *
+     * @param {Key} key - Cache key.
+     * @param {CacheDeleteReason} [reason="deleted"] - Reason for deletion.
+     * @returns {boolean} True if the key existed and was deleted.
+     */
     delete(key, reason = "deleted") {
         const entry = __classPrivateFieldGet(this, _Cache_store, "f").get(key);
         if (entry) {
@@ -333,6 +534,11 @@ class Cache {
         }
         return false;
     }
+    /**
+     * Deletes all expired entries based on the current time.
+     *
+     * @returns {number} Number of entries removed.
+     */
     deleteExpired() {
         let count = 0;
         const now = this.now();
@@ -378,6 +584,9 @@ class Cache {
         }
         return count;
     }
+    /**
+     * Clears all entries from the cache (including LRU and expiry buckets).
+     */
     clear() {
         for (const [, bucket] of __classPrivateFieldGet(this, _Cache_expBuckets, "f")) {
             bucket.clear();
@@ -388,37 +597,6 @@ class Cache {
     }
 }
 exports.Cache = Cache;
-_Cache_updateLRU = function _Cache_updateLRU(key, entry, evictLRU) {
-    if (__classPrivateFieldGet(this, _Cache_lruMaxSize, "f")) {
-        if (entry.lruNode == null) {
-            entry.lruNode = __classPrivateFieldGet(this, _Cache_lruList, "f").push(key);
-        }
-        else if (entry.lruNode !== __classPrivateFieldGet(this, _Cache_lruList, "f").last) {
-            const node = __classPrivateFieldGet(this, _Cache_lruList, "f").remove(entry.lruNode);
-            __classPrivateFieldGet(this, _Cache_lruList, "f").insertNodeAfter(node, __classPrivateFieldGet(this, _Cache_lruList, "f").last);
-        }
-        if (evictLRU && __classPrivateFieldGet(this, _Cache_store, "f").size > __classPrivateFieldGet(this, _Cache_lruMaxSize, "f")) {
-            const lruKey = __classPrivateFieldGet(this, _Cache_lruList, "f").popFirst();
-            if (lruKey != null) {
-                const exp = entry.exp;
-                if (exp) {
-                    const bucketIndex = __classPrivateFieldGet(this, _Cache_instances, "m", _Cache_bucketIndex).call(this, exp);
-                    const bucket = __classPrivateFieldGet(this, _Cache_expBuckets, "f").get(bucketIndex);
-                    if (bucket) {
-                        bucket.delete(lruKey);
-                        if (bucket.size === 0) {
-                            __classPrivateFieldGet(this, _Cache_expBuckets, "f").delete(bucketIndex);
-                        }
-                    }
-                }
-                __classPrivateFieldGet(this, _Cache_store, "f").delete(lruKey);
-                if (__classPrivateFieldGet(this, _Cache_onDelete, "f")) {
-                    __classPrivateFieldGet(this, _Cache_onDelete, "f").call(this, this, lruKey, entry, "LRU");
-                }
-            }
-        }
-    }
-};
 ;
 exports.default = Cache;
 //# sourceMappingURL=index.js.map

@@ -1,11 +1,192 @@
-# @bepalo/cache
+# 🏆 @bepalo/cache
 
-A fast and modern cache library for javascript runtimes.
+A fast and modern in-memory cache library with TTL and LRU for javascript runtimes.
 
-## Project Status
+## 📦 Project Status
 
 Currently the project is in discovery and experimental stage.
 
+## 📢 Benchmarks
+
+These benchmarks were done on the following system with `1,000,000` iterations, 
+`10,000` warmup iterations, `500,000` LRU limit and `UUIDv4` keys. Checkout [benchmark](bench/benchmark.js)
+
+**System Info:**
+
+```js
+CPU: AMD Ryzen 7 5700U (8 cores, 16 threads)
+RAM: 16 GB DDR4
+OS: Pop!_OS 22.04 (Linux 6.8)
+Node.js: v22.6.0
+```
+
+### 🥇 Bun v1.2.6**
+
+<details>
+<summary>Bun benchmark results</summary>
+
+**Benchmarking @bepalo/cache (N=`1,000,000`, LRU-Limit=`500,000`, K=`UUIDv4`)**
+
+
+| Operation                    | ns/operation | operations/s |
+|------------------------------|--------------|--------------|
+| cache.get: hit               |       111.14 |    8,997,658 |
+| cache.get: miss              |      105.218 |    9,504,060 |
+| cache.get: miss, empty       |       11.781 |   84,883,677 |
+| cache.set: new               |      449.293 |    2,225,718 |
+| cache.set: override          |      534.526 |    1,870,816 |
+| cache.update:                |      298.698 |    3,347,867 |
+| cache.deleteExpired: all     |  333,333,333 |            3 |
+| cache.deleteExpired: none    |  421,052.632 |        2,375 |
+
+**Comparing with native Map**
+
+| Operation                    | ns/operation | operations/s |
+|------------------------------|--------------|--------------|
+| Map.get: hit                 |        4.768 |  209,744,784 |
+| Map.get: miss                |        5.078 |  196,931,841 |
+| Map.get: miss, empty         |        4.539 |  220,326,435 |
+| Map.set:                     |      241.091 |    4,147,819 |
+| Map.set: update              |      139.334 |    7,177,024 |
+| Map.delete:                  |      179.569 |    5,568,900 |
+
+</details>
+
+### 🥈 Node v22.16.0
+
+<details>
+<summary>Node benchmark results</summary>
+
+**Benchmarking @bepalo/cache (N=`1,000,000`, LRU-Limit=`500,000`, K=`UUIDv4`)**
+
+| Operation                    | ns/operation | operations/s |
+|------------------------------|--------------|--------------|
+| cache.get: hit               |        223.6 |    4,472,267 |
+| cache.get: miss              |      235.573 |    4,244,975 |
+| cache.get: miss, empty       |       31.271 |   31,978,921 |
+| cache.set: new               |      889.589 |    1,124,115 |
+| cache.set: override          |    1,167.268 |      856,701 |
+| cache.update:                |      544.116 |    1,837,842 |
+| cache.deleteExpired: all     |  500,000,000 |            2 |
+| cache.deleteExpired: none    |  176,211.454 |        5,675 |
+
+**Comparing with native Map**
+
+| Operation                    | ns/operation | operations/s |
+|------------------------------|--------------|--------------|
+| Map.get: hit                 |      185.881 |    5,379,777 |
+| Map.get: miss                |      184.672 |    5,415,001 |
+| Map.get: miss, empty         |        9.007 |  111,025,374 |
+| Map.set:                     |      268.631 |    3,722,579 |
+| Map.set: update              |      196.197 |    5,096,925 |
+| Map.delete:                  |      219.495 |    4,555,914 |
+
+</details>
+
+
+## 📦 Basic Usage
+
+
+```js
+import { Cache } from "@bepalo/cache";
+
+const cache = new Cache();
+
+cache.set("hello", "world");
+console.log(cache.get("hello")?.value); // => "world"
+
+cache.delete("hello");
+console.log(cache.get("hello")); // => undefined
+```
+
+### Using TTL (Time to Live)
+
+```js
+const cache = new Cache({
+  defaultMaxAge: 1000, // 1 second TTL
+});
+
+cache.set("foo", 123);
+setTimeout(() => {
+  console.log(cache.get("foo")); // => undefined (expired)
+}, 1500);
+```
+
+### With LRU Eviction
+
+```js
+const cache = new Cache({
+  lruMaxSize: 2,
+});
+
+cache.set("a", 1);
+cache.set("b", 2);
+cache.set("c", 3); // "a" gets evicted (least recently used)
+
+console.log(cache.has("a")); // => false
+console.log(cache.has("b")); // => true
+```
+
+### Custom expiration time and cleanup interval
+
+```js
+const cache = new Cache({
+  defaultExp: () => Date.now() + 5000, // set default expiry using a function
+  cleanupInterval: 500, // auto-clean every 500ms
+});
+
+cache.set("temp", "value", { maxAge: 100 }); // expires in 100ms
+
+setTimeout(() => {
+  console.log(cache.has("temp")); // => false
+}, 1000);
+```
+
+### Custom time functions
+
+```js
+const cache = new Cache({
+  now: () => Date.now() / 1000, // now will return time in seconds
+  defaultMaxAge: 60 // treated as 60 seconds
+  cleanupInterval: 5, // auto-clean every 5sec
+});
+
+cache.set("temp", "value", { maxAge: 3 }); // expires in 3sec
+
+setTimeout(() => {
+  console.log(cache.has("temp")); // => false
+}, 4000);
+```
+
+### Using event hooks
+
+
+```js
+const cache = new Cache({
+  deleteExpiredOnGet: true,
+
+  onGetHit: (cache, key, entry) => {
+    console.log(`Hit: ${key}`);
+  },
+  onGetMiss: (cache, key, reason) => {
+    console.log(`Miss: ${key} (${reason})`);
+  },
+  onDelete: (cache, key, entry, reason) => {
+    console.log(`Deleted: ${key} (${reason})`);
+  },
+  onDeleteExpired: (count) => {
+    console.log(`Expired entries removed: ${count}`);
+  }
+});
+
+cache.set("x", 42, { maxAge: 10 });
+
+cache.get("y"); // triggers `onGetMiss`
+
+setTimeout(() => {
+  cache.get("x"); // triggers `onGetHit`, `onDelete`, `onDeleteExpired`
+}, 100);
+```
 
 ## Sample
 

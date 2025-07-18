@@ -1,7 +1,7 @@
 {
   "name": "@bepalo/cache",
-  "version": "0.3.0",
-  "description": "A modern synchronized key-value store library for javascript runtimes.",
+  "version": "0.4.0",
+  "description": "A fast and modern in-memory cache library with TTL and LRU for javascript runtimes.",
   "author": "Natnael Eshetu",
   "license": "MIT",
   "repository": {

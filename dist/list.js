@@ -1,5 +1,6 @@
 "use strict";
 /**
+ * @file A minimal and efficient implementation of a doubly-linked list with node-level access.
  * @author Natnael Eshetu
  * @exports List
  * @exports ListNode
@@ -18,7 +19,17 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
 var _List_first, _List_last, _List_size;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.List = exports.ListNode = void 0;
+/**
+ * A node in a doubly linked list.
+ * @template T
+ */
 class ListNode {
+    /**
+     * Creates a new ListNode.
+     * @param {T} value - Value held by this node.
+     * @param {ListNode<T>} [prev] - Previous node in the list.
+     * @param {ListNode<T>} [next] - Next node in the list.
+     */
     constructor(value, prev, next) {
         this.value = value;
         this.prev = prev;
@@ -27,7 +38,12 @@ class ListNode {
 }
 exports.ListNode = ListNode;
 class List {
+    /**
+     * Creates a new List instance. If an iterable is provided, pushes all values into the list.
+     * @param {Iterable<T>} [iterable] - Optional iterable of values to initialize the list.
+     */
     constructor(iterable) {
+        // Private fields
         _List_first.set(this, undefined);
         _List_last.set(this, undefined);
         _List_size.set(this, 0);
@@ -37,26 +53,46 @@ class List {
             }
         }
     }
+    /**
+     * Iterates over the values in the list from first to last.
+     * @returns {IterableIterator<T>}
+     */
     *[(_List_first = new WeakMap(), _List_last = new WeakMap(), _List_size = new WeakMap(), Symbol.iterator)]() {
         for (let it = __classPrivateFieldGet(this, _List_first, "f"); it != null; it = it.next) {
             yield it.value;
         }
     }
+    /**
+     * Alias for [Symbol.iterator].
+     * @returns {IterableIterator<T>}
+     */
     *entries() {
         for (let it = __classPrivateFieldGet(this, _List_first, "f"); it != null; it = it.next) {
             yield it.value;
         }
     }
+    /**
+     * Iterates over the list nodes (including value, prev, and next).
+     * @returns {IterableIterator<ListNode<T>>}
+     */
     *iterator() {
         for (let it = __classPrivateFieldGet(this, _List_first, "f"); it != null; it = it.next) {
             yield it;
         }
     }
+    /**
+     * Iterates over the list nodes in reverse (last to first).
+     * @returns {IterableIterator<ListNode<T>>}
+     */
     *reverseIterator() {
         for (let it = __classPrivateFieldGet(this, _List_last, "f"); it != null; it = it.prev) {
             yield it;
         }
     }
+    /**
+     * Converts the list to an array of values.
+     * @returns {T[]}
+     */
     toArray() {
         const values = new Array(__classPrivateFieldGet(this, _List_size, "f"));
         for (let it = __classPrivateFieldGet(this, _List_first, "f"), i = 0; it != null; it = it.next, i++) {
@@ -64,28 +100,44 @@ class List {
         }
         return values;
     }
+    /**
+     * Serializes the list to a JSON-compatible array.
+     * @returns {T[]}
+     */
     toJSON() {
         return this.toArray();
     }
+    /**
+     * Returns a stringified JSON representation of the list.
+     * @returns {string}
+     */
     toString() {
         return JSON.stringify(this.toArray());
     }
+    /** @returns {T[]} The list in array form */
     [Symbol.for("nodejs.util.inspect.custom")]() {
         return this.toArray();
     }
+    /** @returns {T[]} The list in array form */
     [Symbol.toPrimitive](hint) {
         return this.toArray();
     }
+    /** @returns {number} Current size of the list */
     get size() {
         return __classPrivateFieldGet(this, _List_size, "f");
     }
+    /** @returns {ListNode<T>|undefined} First node in the list */
     get first() {
         return __classPrivateFieldGet(this, _List_first, "f");
     }
+    /** @returns {ListNode<T>|undefined} Last node in the list */
     get last() {
         return __classPrivateFieldGet(this, _List_last, "f");
     }
-    // remove from the start
+    /**
+     * Removes and returns the first value in the list.
+     * @returns {T | undefined}
+     */
     popFirst() {
         var _a;
         var _b, _c;
@@ -107,7 +159,10 @@ class List {
         }
         return value;
     }
-    // remove from the end
+    /**
+     * Removes and returns the last value in the list.
+     * @returns {T | undefined}
+     */
     pop() {
         var _a;
         var _b, _c;
@@ -129,7 +184,11 @@ class List {
         }
         return value;
     }
-    // insert value at the end
+    /**
+     * Appends a new value to the end of the list.
+     * @param {T} value - Value to append.
+     * @returns {ListNode<T>} The inserted node.
+     */
     push(value) {
         var _a;
         const node = new ListNode(value);
@@ -144,7 +203,11 @@ class List {
         __classPrivateFieldSet(this, _List_size, (_a = __classPrivateFieldGet(this, _List_size, "f"), _a++, _a), "f");
         return node;
     }
-    // insert value at the start
+    /**
+     * Prepends a new value to the beginning of the list.
+     * @param {T} value - Value to prepend.
+     * @returns {ListNode<T>} The inserted node.
+     */
     pushStart(value) {
         var _a;
         const node = new ListNode(value);
@@ -159,7 +222,12 @@ class List {
         __classPrivateFieldSet(this, _List_size, (_a = __classPrivateFieldGet(this, _List_size, "f"), _a++, _a), "f");
         return node;
     }
-    // insert after the node
+    /**
+     * Inserts an existing node after the target node.
+     * @param {ListNode<T>} node - Node to insert.
+     * @param {ListNode<T>} targetNode - Node to insert after.
+     * @returns {ListNode<T>} The inserted node.
+     */
     insertNodeAfter(node, targetNode) {
         var _a;
         node.prev = targetNode;
@@ -174,7 +242,12 @@ class List {
         __classPrivateFieldSet(this, _List_size, (_a = __classPrivateFieldGet(this, _List_size, "f"), _a++, _a), "f");
         return node;
     }
-    // insert after the node
+    /**
+     * Inserts a new value after the target node.
+     * @param {T} value - Value to insert.
+     * @param {ListNode<T>} targetNode - Node to insert after.
+     * @returns {ListNode<T>} The new node.
+     */
     insertAfter(value, targetNode) {
         var _a;
         const node = new ListNode(value, targetNode, targetNode.next);
@@ -188,7 +261,12 @@ class List {
         __classPrivateFieldSet(this, _List_size, (_a = __classPrivateFieldGet(this, _List_size, "f"), _a++, _a), "f");
         return node;
     }
-    // insert before the node
+    /**
+     * Inserts an existing node before the target node.
+     * @param {ListNode<T>} node - Node to insert.
+     * @param {ListNode<T>} targetNode - Node to insert before.
+     * @returns {ListNode<T>} The inserted node.
+     */
     insertNodeBefore(node, targetNode) {
         var _a;
         node.prev = targetNode.prev;
@@ -203,7 +281,12 @@ class List {
         __classPrivateFieldSet(this, _List_size, (_a = __classPrivateFieldGet(this, _List_size, "f"), _a++, _a), "f");
         return node;
     }
-    // insert before the node
+    /**
+     * Inserts a new value before the target node.
+     * @param {T} value - Value to insert.
+     * @param {ListNode<T>} targetNode - Node to insert before.
+     * @returns {ListNode<T>} The new node.
+     */
     insertBefore(value, targetNode) {
         var _a;
         const node = new ListNode(value, targetNode.prev, targetNode);
@@ -217,7 +300,11 @@ class List {
         __classPrivateFieldSet(this, _List_size, (_a = __classPrivateFieldGet(this, _List_size, "f"), _a++, _a), "f");
         return node;
     }
-    // remove the node
+    /**
+     * Removes the given node from the list.
+     * @param {ListNode<T>} node - Node to remove.
+     * @returns {ListNode<T>} The removed node.
+     */
     remove(node) {
         var _a;
         if (node.next != null) {
@@ -235,12 +322,21 @@ class List {
         __classPrivateFieldSet(this, _List_size, (_a = __classPrivateFieldGet(this, _List_size, "f"), _a--, _a), "f");
         return node;
     }
-    // clear the list
+    /**
+     * Clears the list.
+     * @returns {void}
+     */
     clear() {
         __classPrivateFieldSet(this, _List_first, __classPrivateFieldSet(this, _List_last, undefined, "f"), "f");
         __classPrivateFieldSet(this, _List_size, 0, "f");
     }
-    // moves around elements across the edges
+    /**
+     * Rotates the list by the given amount.
+     * Positive values move nodes from first to last.
+     * Negative values move nodes from last to first.
+     * @param {number} amount - Number of positions to rotate.
+     * @returns {number} The absolute number of rotations performed.
+     */
     rotate(amount) {
         if (__classPrivateFieldGet(this, _List_first, "f") == null || __classPrivateFieldGet(this, _List_last, "f") == null || __classPrivateFieldGet(this, _List_size, "f") === 0) { // empty or invalid
             return 0;
@@ -276,7 +372,16 @@ class List {
         __classPrivateFieldGet(this, _List_last, "f").next = undefined;
         return absAmount;
     }
-    // removes `amount` elements from the start and returns the node from where detached
+    /**
+   * Removes `amount` nodes from the start of the list and returns the last node
+   * of the detached segment (i.e., the node that was at the boundary of the detachment).
+   *
+   * If `amount` is greater than or equal to the list size, the entire list is cleared,
+   * and the original first node is returned.
+   *
+   * @param {number} amount - Number of nodes to remove from the start.
+   * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
+   */
     trimStart(amount) {
         if (__classPrivateFieldGet(this, _List_first, "f") == null || __classPrivateFieldGet(this, _List_last, "f") == null || amount <= 0) { // empty
             return undefined;
@@ -318,7 +423,16 @@ class List {
         }
         return node;
     }
-    // removes `amount` elements from the end and returns the node from where detached
+    /**
+     * Removes `amount` nodes from the end of the list and returns the first node
+     * of the detached segment (i.e., the node that was at the boundary of the detachment).
+     *
+     * If `amount` is greater than or equal to the list size, the entire list is cleared,
+     * and the original last node is returned.
+     *
+     * @param {number} amount - Number of nodes to remove from the end.
+     * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
+     */
     trimEnd(amount) {
         var _a;
         if (__classPrivateFieldGet(this, _List_first, "f") == null || __classPrivateFieldGet(this, _List_last, "f") == null || amount <= 0) { // empty

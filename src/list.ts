@@ -1,10 +1,22 @@
 /**
+ * @file A minimal and efficient implementation of a doubly-linked list with node-level access.
  * @author Natnael Eshetu
  * @exports List
  * @exports ListNode
  */
 
+/**
+ * A node in a doubly linked list.
+ * @template T
+ */
 export class ListNode<T> {
+
+  /**
+   * Creates a new ListNode.
+   * @param {T} value - Value held by this node.
+   * @param {ListNode<T>} [prev] - Previous node in the list.
+   * @param {ListNode<T>} [next] - Next node in the list.
+   */
   constructor(
     public value: T,
     public prev?: ListNode<T>,
@@ -13,10 +25,15 @@ export class ListNode<T> {
 }
 
 export class List<T> {
+  // Private fields
   #first?: ListNode<T> = undefined;
   #last?: ListNode<T> = undefined;
   #size: number = 0;
 
+  /**
+   * Creates a new List instance. If an iterable is provided, pushes all values into the list.
+   * @param {Iterable<T>} [iterable] - Optional iterable of values to initialize the list.
+   */
   constructor(iterable?: Iterable<T>) {
     if (iterable) {
       for (const value of iterable) {
@@ -25,30 +42,50 @@ export class List<T> {
     }
   }
 
+  /**
+   * Iterates over the values in the list from first to last.
+   * @returns {IterableIterator<T>}
+   */
   *[Symbol.iterator](): IterableIterator<T> {
     for(let it = this.#first; it != null; it = it.next) {
       yield it.value;
     }
   }
 
+  /**
+   * Alias for [Symbol.iterator].
+   * @returns {IterableIterator<T>}
+   */
   *entries(): IterableIterator<T> {
     for(let it = this.#first; it != null; it = it.next) {
       yield it.value;
     }
   }
 
+  /**
+   * Iterates over the list nodes (including value, prev, and next).
+   * @returns {IterableIterator<ListNode<T>>}
+   */
   *iterator(): IterableIterator<ListNode<T>> {
     for(let it = this.#first; it != null; it = it.next) {
       yield it;
     }
   }
 
+  /**
+   * Iterates over the list nodes in reverse (last to first).
+   * @returns {IterableIterator<ListNode<T>>}
+   */
   *reverseIterator(): IterableIterator<ListNode<T>> {
     for(let it = this.#last; it != null; it = it.prev) {
       yield it;
     }
   }
 
+  /**
+   * Converts the list to an array of values.
+   * @returns {T[]}
+   */
   toArray(): T[] {
     const values:T[] = new Array(this.#size);
     for(let it = this.#first, i = 0; it != null; it = it.next, i++) {
@@ -57,35 +94,51 @@ export class List<T> {
     return values;
   }
 
+  /**
+   * Serializes the list to a JSON-compatible array.
+   * @returns {T[]}
+   */
   toJSON(): T[] {
     return this.toArray();
   }
 
+  /**
+   * Returns a stringified JSON representation of the list.
+   * @returns {string}
+   */
   toString(): string {
     return JSON.stringify(this.toArray());
   }
 
-  [Symbol.for("nodejs.util.inspect.custom")]() {
+  /** @returns {T[]} The list in array form */
+  [Symbol.for("nodejs.util.inspect.custom")](): T[] {
     return this.toArray();
   }
 
+  /** @returns {T[]} The list in array form */
   [Symbol.toPrimitive](hint?: string): T[] {
     return this.toArray();
   }
 
-  get size() {
+  /** @returns {number} Current size of the list */
+  get size(): number {
     return this.#size;
   }
 
-  get first() {
+  /** @returns {ListNode<T>|undefined} First node in the list */
+  get first(): ListNode<T> | undefined {
     return this.#first;
   }
 
-  get last() {
+  /** @returns {ListNode<T>|undefined} Last node in the list */
+  get last(): ListNode<T> | undefined {
     return this.#last;
   }
 
-  // remove from the start
+  /**
+   * Removes and returns the first value in the list.
+   * @returns {T | undefined}
+   */
   popFirst(): T | undefined {
     const value = this.#first?.value;
     if(this.#first == null || this.#last == null) { // empty
@@ -104,7 +157,10 @@ export class List<T> {
     return value;
   }
 
-  // remove from the end
+  /**
+   * Removes and returns the last value in the list.
+   * @returns {T | undefined}
+   */
   pop(): T | undefined {
     const value = this.#last?.value;
     if(this.#first == null || this.#last == null) { // empty
@@ -123,7 +179,11 @@ export class List<T> {
     return value;
   }
 
-  // insert value at the end
+  /**
+   * Appends a new value to the end of the list.
+   * @param {T} value - Value to append.
+   * @returns {ListNode<T>} The inserted node.
+   */
   push(value: T): ListNode<T> {
     const node = new ListNode<T>(value);
     if(this.#first == null || this.#last == null) { // empty
@@ -137,7 +197,11 @@ export class List<T> {
     return node;
   }
 
-  // insert value at the start
+  /**
+   * Prepends a new value to the beginning of the list.
+   * @param {T} value - Value to prepend.
+   * @returns {ListNode<T>} The inserted node.
+   */
   pushStart(value: T): ListNode<T> {
     const node = new ListNode<T>(value);
     if(this.#first == null || this.#last == null) { // empty
@@ -151,7 +215,12 @@ export class List<T> {
     return node;
   }
 
-  // insert after the node
+  /**
+   * Inserts an existing node after the target node.
+   * @param {ListNode<T>} node - Node to insert.
+   * @param {ListNode<T>} targetNode - Node to insert after.
+   * @returns {ListNode<T>} The inserted node.
+   */
   insertNodeAfter(node: ListNode<T>, targetNode: ListNode<T>): ListNode<T> {
     node.prev = targetNode;
     node.next = targetNode.next;
@@ -166,7 +235,12 @@ export class List<T> {
     return node;
   }
 
-  // insert after the node
+  /**
+   * Inserts a new value after the target node.
+   * @param {T} value - Value to insert.
+   * @param {ListNode<T>} targetNode - Node to insert after.
+   * @returns {ListNode<T>} The new node.
+   */
   insertAfter(value: T, targetNode: ListNode<T>): ListNode<T> {
     const node = new ListNode<T>(value, targetNode, targetNode.next);
     if(targetNode.next != null) {
@@ -180,7 +254,12 @@ export class List<T> {
     return node;
   }
 
-  // insert before the node
+  /**
+   * Inserts an existing node before the target node.
+   * @param {ListNode<T>} node - Node to insert.
+   * @param {ListNode<T>} targetNode - Node to insert before.
+   * @returns {ListNode<T>} The inserted node.
+   */
   insertNodeBefore(node: ListNode<T>, targetNode: ListNode<T>): ListNode<T> {
     node.prev = targetNode.prev;
     node.next = targetNode;
@@ -195,7 +274,12 @@ export class List<T> {
     return node;
   }
 
-  // insert before the node
+  /**
+   * Inserts a new value before the target node.
+   * @param {T} value - Value to insert.
+   * @param {ListNode<T>} targetNode - Node to insert before.
+   * @returns {ListNode<T>} The new node.
+   */
   insertBefore(value: T, targetNode: ListNode<T>): ListNode<T> {
     const node = new ListNode<T>(value, targetNode.prev, targetNode);
     if(targetNode.prev != null) {
@@ -209,7 +293,11 @@ export class List<T> {
     return node;
   }
 
-  // remove the node
+  /**
+   * Removes the given node from the list.
+   * @param {ListNode<T>} node - Node to remove.
+   * @returns {ListNode<T>} The removed node.
+   */
   remove(node: ListNode<T>): ListNode<T> {
     if(node.next != null) {
       node.next.prev = node.prev;
@@ -227,13 +315,22 @@ export class List<T> {
     return node;
   }
 
-  // clear the list
-  clear() {
+  /**
+   * Clears the list.
+   * @returns {void}
+   */
+  clear(): void {
     this.#first = this.#last = undefined;
     this.#size = 0;
   }
 
-  // moves around elements across the edges
+  /**
+   * Rotates the list by the given amount.
+   * Positive values move nodes from first to last.
+   * Negative values move nodes from last to first.
+   * @param {number} amount - Number of positions to rotate.
+   * @returns {number} The absolute number of rotations performed.
+   */
   rotate(amount: number): number {
     if(this.#first == null || this.#last == null || this.#size === 0) { // empty or invalid
       return 0;
@@ -266,7 +363,16 @@ export class List<T> {
     return absAmount;
   }
 
-  // removes `amount` elements from the start and returns the node from where detached
+  /**
+ * Removes `amount` nodes from the start of the list and returns the last node
+ * of the detached segment (i.e., the node that was at the boundary of the detachment).
+ * 
+ * If `amount` is greater than or equal to the list size, the entire list is cleared,
+ * and the original first node is returned.
+ * 
+ * @param {number} amount - Number of nodes to remove from the start.
+ * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
+ */
   trimStart(amount: number): ListNode<T> | undefined {
     if(this.#first == null || this.#last == null || amount <= 0) { // empty
       return undefined;
@@ -304,7 +410,16 @@ export class List<T> {
     return node;
   }
 
-  // removes `amount` elements from the end and returns the node from where detached
+  /**
+   * Removes `amount` nodes from the end of the list and returns the first node
+   * of the detached segment (i.e., the node that was at the boundary of the detachment).
+   * 
+   * If `amount` is greater than or equal to the list size, the entire list is cleared,
+   * and the original last node is returned.
+   * 
+   * @param {number} amount - Number of nodes to remove from the end.
+   * @returns {ListNode<T> | undefined} The first node of the detached segment, or `undefined` if the list was empty or `amount <= 0`.
+   */
   trimEnd(amount: number): ListNode<T> | undefined {
     if(this.#first == null || this.#last == null || amount <= 0) { // empty
       return undefined;
