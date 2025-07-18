@@ -80,7 +80,7 @@ class Cache {
         _Cache_lruList.set(this, new list_1.List());
         _Cache_expBuckets.set(this, new Map());
         _Cache_intervalId.set(this, undefined);
-        _Cache_now.set(this, () => Date.now());
+        _Cache_now.set(this, Date.now);
         _Cache_timeScale.set(this, 1);
         _Cache_defaultExp.set(this, () => null);
         _Cache_defaultMaxAge.set(this, null);

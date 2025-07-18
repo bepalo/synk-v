@@ -17,33 +17,82 @@
  */
 import { List, ListNode } from "./list";
 export * from "./list";
+/**
+ * Represents a single entry in the cache.
+ */
 export type CacheEntry<Key = string, Value = unknown> = {
+    /** Cache key */
     key: Key;
+    /** Stored value */
     value: Value;
+    /** Expiration timestamp (milliseconds since epoch), or null/undefined if no expiration */
     exp?: number | null;
+    /** Optional reference to the node in the LRU linked list */
     lruNode?: ListNode<CacheEntry<Key, Value>>;
 };
+/**
+ * Type of keys accepted by the cache.
+ */
 export type GenericCacheKey = string | number | Symbol;
+/**
+ * Reason why an entry was deleted from the cache.
+ */
 export type CacheDeleteReason = "LRU" | "expired" | "deleted";
+/**
+ * Reason why a cache `get()` missed.
+ */
 export type CacheMissReason = "missing" | "expired";
+/**
+ * Function to return the current time (usually in milliseconds).
+ */
 export type CacheNowFn = () => number;
+/**
+ * Function to compute a default expiration timestamp.
+ */
 export type CacheDefaultExpFn = () => number | undefined | null;
+/**
+ * Called when a cache `get()` hits an entry.
+ */
 export type CacheOnGetHitFn<Key = GenericCacheKey, Value = unknown> = (cache: Cache<Key, Value>, key: Key, entry: CacheEntry<Key, Value>) => unknown;
+/**
+ * Called when a cache `get()` misses.
+ */
 export type CacheOnGetMissFn<Key = GenericCacheKey, Value = unknown> = (cache: Cache<Key, Value>, key: Key, reason: CacheMissReason) => unknown;
+/**
+ * Called when an entry is deleted from the cache.
+ */
 export type CacheOnDeleteFn<Key = GenericCacheKey, Value = unknown> = (cache: Cache<Key, Value>, key: Key, entry: CacheEntry<Key, Value>, reason: CacheDeleteReason) => unknown;
+/**
+ * Called after expired entries are batch-deleted.
+ */
 export type CacheOnDeleteExpiredFn = (count: number) => unknown;
+/**
+ * Configuration options for initializing a cache.
+ */
 export type CacheConfig<Key = GenericCacheKey, Value = unknown> = {
+    /** Function to get the current time. Defaults to `Date.now`. */
     now?: CacheNowFn;
+    /** Function to compute a default expiration time. */
     defaultExp?: CacheDefaultExpFn;
+    /** Default TTL in milliseconds for new entries (overridden by `exp` or `maxAge`). */
     defaultMaxAge?: number | null;
+    /** Maximum number of entries to keep in the cache (LRU eviction). */
     lruMaxSize?: number | null;
+    /** Interval (ms) for automatic cleanup of expired entries. */
     cleanupInterval?: number;
+    /** Size of expiration buckets (ms). Larger values reduce memory usage. Best to use the same as the `cleanupInterval` */
     expiryBucketSize?: number;
+    /** If true, expired entries can still be retrieved. */
     getExpired?: boolean;
+    /** If true, expired entries will be deleted automatically during `get()`. */
     deleteExpiredOnGet?: boolean;
+    /** Called when an entry is retrieved successfully. */
     onGetHit?: CacheOnGetHitFn<Key, Value> | null;
+    /** Called when an entry is missing or expired. */
     onGetMiss?: CacheOnGetMissFn<Key, Value> | null;
+    /** Called when an entry is removed (explicitly, expired, or evicted). */
     onDelete?: CacheOnDeleteFn<Key, Value> | null;
+    /** Called when expired entries are removed in batch. */
     onDeleteExpired?: CacheOnDeleteExpiredFn | null;
 };
 /**
