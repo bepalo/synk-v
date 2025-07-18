@@ -75,7 +75,15 @@ export declare class Cache<Key = GenericCacheKey, Value = unknown> {
      * @param {CacheOnDeleteExpiredFn} [config.onDeleteExpired] - Hook called when `deleteExpired()` runs, with count of removed entries.
      */
     constructor(config?: CacheConfig<Key, Value>);
+    /**
+     * **Debug only! DO NOT MODIFY**
+     * @returns {List<CacheEntry<Key,Value>>} The LRU list.
+     */
     get lruList(): List<CacheEntry<Key, Value>>;
+    /**
+     * **Debug only! DO NOT MODIFY**
+     * @returns {Map<number,Set<Key>>} The expiration buckets map.
+     */
     get expBuckets(): Map<number, Set<Key>>;
     /**
      * Enables `for...of` iteration over the cache.

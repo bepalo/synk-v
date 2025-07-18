@@ -139,14 +139,6 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
     this.startCleanupInterval();
   }
 
-  get lruList() {
-    return this.#lruList;
-  }
-
-  get expBuckets() {
-    return this.#expBuckets;
-  }
-
   #bucketIndex(time: number): number {
     return Math.floor(time / this.#expiryBucketSize);
   }
@@ -181,6 +173,22 @@ export class Cache<Key=GenericCacheKey, Value=unknown> {
         }
       }
     }
+  }
+
+  /**
+   * **Debug only! DO NOT MODIFY**
+   * @returns {List<CacheEntry<Key,Value>>} The LRU list.
+   */
+  get lruList(): List<CacheEntry<Key,Value>> {
+    return this.#lruList;
+  }
+
+  /**
+   * **Debug only! DO NOT MODIFY**
+   * @returns {Map<number,Set<Key>>} The expiration buckets map.
+   */
+  get expBuckets(): Map<number, Set<Key>> {
+    return this.#expBuckets;
   }
 
   /**

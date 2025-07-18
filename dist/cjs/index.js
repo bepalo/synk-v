@@ -131,9 +131,17 @@ class Cache {
         }
         this.startCleanupInterval();
     }
+    /**
+     * **Debug only! DO NOT MODIFY**
+     * @returns {List<CacheEntry<Key,Value>>} The LRU list.
+     */
     get lruList() {
         return __classPrivateFieldGet(this, _Cache_lruList, "f");
     }
+    /**
+     * **Debug only! DO NOT MODIFY**
+     * @returns {Map<number,Set<Key>>} The expiration buckets map.
+     */
     get expBuckets() {
         return __classPrivateFieldGet(this, _Cache_expBuckets, "f");
     }
