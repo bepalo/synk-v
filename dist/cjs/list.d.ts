@@ -163,3 +163,4 @@ export declare class List<T> {
     trimEnd(amount: number): ListNode<T> | undefined;
 }
 export default List;
+//# sourceMappingURL=list.d.ts.map

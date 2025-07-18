@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@types/node@^24.0.13",
+        "npm:typescript@^5.8.3",
+        "npm:vitest-markdown-reporter@~0.1.2",
+        "npm:vitest@^3.2.4"
+      ]
+    }
+  }
+}

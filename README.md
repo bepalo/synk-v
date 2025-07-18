@@ -20,69 +20,115 @@ OS: Pop!_OS 22.04 (Linux 6.8)
 Node.js: v22.6.0
 ```
 
-### 🥇 Bun v1.2.6**
+---
+
+![benchmark-chart](assets/bench-charts.png)
+![benchmark-chart-logarithmic](assets/bench-charts-log.png)
+
+---
+
+### 🥇 Bun v1.2.6
 
 <details>
-<summary>Bun benchmark results</summary>
+<summary>Bun benchmark results</summary>  
 
-**Benchmarking @bepalo/cache (N=`1,000,000`, LRU-Limit=`500,000`, K=`UUIDv4`)**
-
+**Benchmarking @bepalo/cache (N=`1,000,000` LRU-Limit=`500,000` K=`UUIDv4`)**
 
 | Operation                    | ns/operation | operations/s |
-|------------------------------|--------------|--------------|
-| cache.get: hit               |       111.14 |    8,997,658 |
-| cache.get: miss              |      105.218 |    9,504,060 |
-| cache.get: miss, empty       |       11.781 |   84,883,677 |
-| cache.set: new               |      449.293 |    2,225,718 |
-| cache.set: override          |      534.526 |    1,870,816 |
-| cache.update:                |      298.698 |    3,347,867 |
-| cache.deleteExpired: all     |  333,333,333 |            3 |
-| cache.deleteExpired: none    |  421,052.632 |        2,375 |
+|------------------------------|-------------:|-------------:|
+| cache.get: hit               |      116.564 |    8,578,950 |
+| cache.get: miss              |       94.295 |   10,605,059 |
+| cache.get: miss, empty       |       18.543 |   53,929,990 |
+| cache.set: new               |      486.156 |    2,056,952 |
+| cache.set: override          |      498.203 |    2,007,212 |
+| cache.update:                |      331.407 |    3,017,433 |
+| cache.deleteExpired: all     |      649.958 |    1,538,560 |
+| cache.deleteExpired: none    |      228.615 |    4,374,163 |
 
 **Comparing with native Map**
 
 | Operation                    | ns/operation | operations/s |
 |------------------------------|--------------|--------------|
-| Map.get: hit                 |        4.768 |  209,744,784 |
-| Map.get: miss                |        5.078 |  196,931,841 |
-| Map.get: miss, empty         |        4.539 |  220,326,435 |
-| Map.set:                     |      241.091 |    4,147,819 |
-| Map.set: update              |      139.334 |    7,177,024 |
-| Map.delete:                  |      179.569 |    5,568,900 |
+| Map.get: hit                 |        9.427 |  106,073,598 |
+| Map.get: miss                |        7.259 |  137,769,231 |
+| Map.get: miss, empty         |        7.935 |  126,018,988 |
+| Map.set:                     |      279.194 |    3,581,743 |
+| Map.set: update              |      173.293 |    5,770,580 |
+| Map.delete: all              |      191.224 |    5,229,465 |
+| Map.delete: none             |       11.472 |   87,171,224 |
 
 </details>
 
-### 🥈 Node v22.16.0
+---
+
+### 🥈 Deno v2.4.2
+
+<details>
+
+<summary>Deno benchmark results</summary>
+
+**Benchmarking @bepalo/cache (N=`1,000,000` LRU-Limit=`500,000` K=`UUIDv4`)**
+
+| Operation                    | ns/operation | operations/s |
+|------------------------------|-------------:|-------------:|
+| cache.get: hit               |      131.629 |    7,597,089 |
+| cache.get: miss              |      178.165 |    5,612,785 |
+| cache.get: miss, empty       |       10.161 |   98,418,223 |
+| cache.set: new               |      482.446 |    2,072,770 |
+| cache.set: override          |      641.308 |    1,559,313 |
+| cache.update:                |      311.356 |    3,211,761 |
+| cache.deleteExpired: all     |      588.244 |    1,699,973 |
+| cache.deleteExpired: none    |       77.864 |   12,842,870 |
+
+**Comparing with native Map**
+
+| Operation                    | ns/operation | operations/s |
+|------------------------------|--------------|--------------|
+| Map.get: hit                 |        8.294 |  120,570,922 |
+| Map.get: miss                |        9.033 |  110,710,977 |
+| Map.get: miss, empty         |        5.933 |  168,554,446 |
+| Map.set:                     |      312.715 |    3,197,799 |
+| Map.set: update              |      179.718 |    5,564,266 |
+| Map.delete: all              |      218.321 |    4,580,405 |
+| Map.delete: none             |       10.184 |   98,192,050 |
+
+</details>
+
+---
+
+### 🥉 Node v22.16.0
 
 <details>
 <summary>Node benchmark results</summary>
 
-**Benchmarking @bepalo/cache (N=`1,000,000`, LRU-Limit=`500,000`, K=`UUIDv4`)**
+**Benchmarking @bepalo/cache (N=`1,000,000` LRU-Limit=`500,000` K=`UUIDv4`)**
 
 | Operation                    | ns/operation | operations/s |
-|------------------------------|--------------|--------------|
-| cache.get: hit               |        223.6 |    4,472,267 |
-| cache.get: miss              |      235.573 |    4,244,975 |
-| cache.get: miss, empty       |       31.271 |   31,978,921 |
-| cache.set: new               |      889.589 |    1,124,115 |
-| cache.set: override          |    1,167.268 |      856,701 |
-| cache.update:                |      544.116 |    1,837,842 |
-| cache.deleteExpired: all     |  500,000,000 |            2 |
-| cache.deleteExpired: none    |  176,211.454 |        5,675 |
+|------------------------------|-------------:|-------------:|
+| cache.get: hit               |      245.625 |    4,071,248 |
+| cache.get: miss              |      234.214 |    4,269,607 |
+| cache.get: miss, empty       |       29.907 |   33,436,985 |
+| cache.set: new               |      854.164 |    1,170,734 |
+| cache.set: override          |    1,138.106 |      878,652 |
+| cache.update:                |      523.995 |    1,908,415 |
+| cache.deleteExpired: all     |      788.144 |    1,268,803 |
+| cache.deleteExpired: none    |      163.846 |    6,103,304 |
 
 **Comparing with native Map**
 
 | Operation                    | ns/operation | operations/s |
 |------------------------------|--------------|--------------|
-| Map.get: hit                 |      185.881 |    5,379,777 |
-| Map.get: miss                |      184.672 |    5,415,001 |
-| Map.get: miss, empty         |        9.007 |  111,025,374 |
-| Map.set:                     |      268.631 |    3,722,579 |
-| Map.set: update              |      196.197 |    5,096,925 |
-| Map.delete:                  |      219.495 |    4,555,914 |
+| Map.get: hit                 |      191.249 |    5,228,772 |
+| Map.get: miss                |      187.621 |    5,329,892 |
+| Map.get: miss, empty         |        9.039 |  110,635,966 |
+| Map.set:                     |      291.251 |    3,433,466 |
+| Map.set: update              |      239.813 |    4,169,920 |
+| Map.delete: all              |      383.207 |    2,609,554 |
+| Map.delete: none             |        9.990 |  100,100,731 |
 
 </details>
 
+---
 
 ## 📦 Basic Usage
 

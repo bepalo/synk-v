@@ -2,8 +2,9 @@
   "name": "@bepalo/cache",
   "description": "A fast and modern in-memory cache library with TTL and LRU for javascript runtimes.",
   "author": "Natnael Eshetu",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "license": "MIT",
-  "main": "./src/index.ts",
-  "exports": "./mod.ts"
+  "exports": {
+    "./mod.ts": "./src/index.ts"
+  }
 }

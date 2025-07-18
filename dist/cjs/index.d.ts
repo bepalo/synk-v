@@ -304,3 +304,4 @@ export declare class Cache<Key = GenericCacheKey, Value = unknown> {
     clear(): void;
 }
 export default Cache;
+//# sourceMappingURL=index.d.ts.map
