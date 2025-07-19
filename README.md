@@ -1,10 +1,55 @@
 # 🏆 @bepalo/cache
 
+[![npm version](https://img.shields.io/npm/v/@bepalo/cache.svg)](https://www.npmjs.com/package/@bepalo/cache)
+[![CI](https://github.com/bepalo/cache/actions/workflows/ci.yaml/badge.svg)](https://github.com/bepalo/cache/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/bepalo/cache/ci.yaml?label=tests&style=flat-square)](https://github.com/bepalo/cache/actions/workflows/ci.yaml.yml)
+[![license](https://img.shields.io/npm/l/@bepalo/cache.svg)](LICENSE)
+![Benchmarked](https://img.shields.io/badge/benchmarked-yes-green)
+
+[![Vitest](https://img.shields.io/badge/vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](test-result.md)
+
 A fast and modern in-memory cache library with TTL and LRU for javascript runtimes.
 
-## 📦 Project Status
+## ✨ Features
 
-Currently the project is in discovery and experimental stage.
+- ⚡ Fast – Optimized for high-throughput.
+- 🧠 In-Memory – Lightweight and efficient key-value store for temporary data.
+- ⏱ TTL Support – Automatically expire items after a configurable time (Time To Live).
+- ♻️ LRU Eviction – Least Recently Used eviction strategy to cap memory usage.
+- 🧹 Auto Cleanup – Background cleanup of expired items at regular intervals.
+- 🧩 Custom Expiry Logic – Use fixed timestamps, max-ages or dynamic expiry functions per entry.
+- 🕰 Custom Time Source – Override time logic (e.g., for time units like seconds).
+- 🔌 Event Hooks – Event handling of get, miss, delete, expire, lru, etc.
+- 👀 Peeking & Expired Access – Read expired entries or inspect values without triggering eviction.
+- 🔁 Iterator Support – Fully iterable using for...of over entries.
+- 🧪 Cross-runtime Compatibility – Works seamlessly in Node.js, Deno, and Bun.
+- 📦 Zero Dependencies – Clean, modern codebase with no external runtime dependencies.
+
+## 🚀 Get Started
+
+### 📥 Installation
+
+**Node.js / Bun (npm / pnpm / yarn)**
+
+```sh
+bun add @bepalo/cache
+# or
+pnpm add @bepalo/cache
+# or
+npm install @bepalo/cache
+# or
+yarn add @bepalo/cache
+```
+
+**Deno**
+
+```ts
+Import directly using the URL:
+
+import { Cache } from "npm:@bepalo/cache";
+// or
+import { Cache } from "jsr:@bepalo/cache";
+```
 
 ## 📢 Benchmarks
 
@@ -232,7 +277,10 @@ setTimeout(() => {
 }, 100);
 ```
 
-## Sample
+### Full Example
+
+<details>
+<summary>Code</summary>
 
 ```ts
 import { Cache } from ".";
@@ -276,7 +324,10 @@ for (const [key, entry] of cache) {
 }
 ```
 
-OUTPUT:
+</details>
+
+<details>
+<summary>Output</summary>
 
 ```sh
 1ms:  Evict LRU item-1
@@ -304,3 +355,27 @@ OUTPUT:
 4003ms:  missing item-4
 4003ms:  6 get undefined
 ```
+
+</details>
+
+## 🕊️ Thanks and Enjoy
+
+If you like this library and want to support then please give a star on [GitHub](https://github.com/bepalo/cache).
+
+## 💖 Be a Sponsor
+
+Fund me so I can give more attention to the products and services you liked.
+
+<p align="left">
+  <a href="https://ko-fi.com/natieshzed" target="_blank">
+    <img height="32" src="https://img.shields.io/badge/Ko--fi-donate-orange?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Ko-fi Badge"> 
+  </a>
+  <br/> 
+  <a href="https://bybit.com" target="_blank"> 
+    <img height="32" src="https://img.shields.io/badge/ByBit-UID%3A%20225636163-blueviolet?style=for-the-badge&logo=bitcoin&logoColor=white" alt="ByBit UID"> 
+  </a> 
+  <br/>
+  <a href="https://www.blockchain.com/btc/address/16wLsJMVC9znDrFQCYFhVfpHwLofx8foqS" target="_blank"> 
+    <img height="32" src="https://img.shields.io/badge/BTC-16wLsJMVC9znDrFQCYFhVfpHwLofx8foqS-orange?style=for-the-badge&logo=bitcoin&logoColor=white" alt="BTC Wallet"> 
+  </a> 
+</p>
