@@ -1,6 +1,6 @@
 {
   "name": "@bepalo/cache",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A fast and modern in-memory cache library with TTL and LRU for javascript runtimes.",
   "author": "Natnael Eshetu",
   "license": "MIT",

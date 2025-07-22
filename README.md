@@ -1,8 +1,8 @@
 # 🏆 @bepalo/cache
 
 [![npm version](https://img.shields.io/npm/v/@bepalo/cache.svg)](https://www.npmjs.com/package/@bepalo/cache)
-[![CI](https://github.com/bepalo/cache/actions/workflows/ci.yaml/badge.svg)](https://github.com/bepalo/cache/actions)
-[![Tests](https://img.shields.io/github/actions/workflow/status/bepalo/cache/ci.yaml?label=tests&style=flat-square)](https://github.com/bepalo/cache/actions/workflows/ci.yaml.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/bepalo/cache/ci.yaml?label=ci)](https://github.com/bepalo/cache/actions/workflows/ci.yaml)
+[![tests](https://img.shields.io/github/actions/workflow/status/bepalo/cache/testing.yaml?label=tests)](https://github.com/bepalo/cache/actions/workflows/testing.yaml)
 [![license](https://img.shields.io/npm/l/@bepalo/cache.svg)](LICENSE)
 ![Benchmarked](https://img.shields.io/badge/benchmarked-yes-green)
 
@@ -370,12 +370,4 @@ Fund me so I can give more attention to the products and services you liked.
   <a href="https://ko-fi.com/natieshzed" target="_blank">
     <img height="32" src="https://img.shields.io/badge/Ko--fi-donate-orange?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Ko-fi Badge"> 
   </a>
-  <br/> 
-  <a href="https://bybit.com" target="_blank"> 
-    <img height="32" src="https://img.shields.io/badge/ByBit-UID%3A%20225636163-blueviolet?style=for-the-badge&logo=bitcoin&logoColor=white" alt="ByBit UID"> 
-  </a> 
-  <br/>
-  <a href="https://www.blockchain.com/btc/address/16wLsJMVC9znDrFQCYFhVfpHwLofx8foqS" target="_blank"> 
-    <img height="32" src="https://img.shields.io/badge/BTC-16wLsJMVC9znDrFQCYFhVfpHwLofx8foqS-orange?style=for-the-badge&logo=bitcoin&logoColor=white" alt="BTC Wallet"> 
-  </a> 
 </p>
